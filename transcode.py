@@ -58,7 +58,7 @@ def main():
     else:
         process_message(data)
     finally:
-        if data:
+        if data and data.get("ReceiptHandle", None) is not None:
             receipt_handle = data["ReceiptHandle"]
             sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
     print("All done. Exiting")
