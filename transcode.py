@@ -61,6 +61,7 @@ def main():
         if data:
             receipt_handle = data["ReceiptHandle"]
             sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
+    print("All done. Exiting")
 
 
 if __name__ == "__main__":
