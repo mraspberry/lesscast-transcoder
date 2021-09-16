@@ -50,10 +50,15 @@ def process_message(msg):
 def main():
     sqs = boto3.client("sqs")
     queue_url = sqs.get_queue_url(QueueName=os.getenv("QUEUE_NAME"))["QueueUrl"]
-    data = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)["Messages"][0]
-    receipt_handle = data["ReceiptHandle"]
-    process_message(data)
-    sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
+    try:
+        data = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)["Messages"][0]
+    except KeyError:
+        print('Not an expected event type. Skipping it', file=sys.stderr)
+    else:
+        process_message(data)
+    finally:
+        receipt_handle = data["ReceiptHandle"]
+        sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
 
 
 if __name__ == "__main__":
