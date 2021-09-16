@@ -47,16 +47,22 @@ def process_message(msg):
     )
 
 
+def process_messages(messages):
+    for msg in messages:
+        process_message(msg)
+
+
 def main():
     sqs = boto3.client("sqs")
     queue_url = sqs.get_queue_url(QueueName=os.getenv("QUEUE_NAME"))["QueueUrl"]
-    data = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=1)
+    data = sqs.receive_message(QueueUrl=queue_url)
+    print(json.dumps(data))
     try:
-        data = data["Messages"][0]
-    except (KeyError, IndexError):
+        messages = data["Messages"]
+    except KeyError:
         print("Not an expected event type. Skipping it", file=sys.stderr)
     else:
-        process_message(data)
+        process_messages(messages)
     finally:
         if data and data.get("ReceiptHandle", None) is not None:
             receipt_handle = data["ReceiptHandle"]
