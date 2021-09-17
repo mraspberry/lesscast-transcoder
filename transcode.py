@@ -55,18 +55,20 @@ def process_messages(messages):
 def main():
     sqs = boto3.client("sqs")
     queue_url = sqs.get_queue_url(QueueName=os.getenv("QUEUE_NAME"))["QueueUrl"]
-    data = sqs.receive_message(QueueUrl=queue_url)
-    print(json.dumps(data))
-    try:
-        messages = data["Messages"]
-    except KeyError:
-        print("Not an expected event type. Skipping it", file=sys.stderr)
-    else:
-        process_messages(messages)
-    finally:
-        if data and data.get("ReceiptHandle", None) is not None:
-            receipt_handle = data["ReceiptHandle"]
-            sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
+    while True:
+        data = sqs.receive_message(QueueUrl=queue_url, WaitTimeSeconds=600)
+        print(json.dumps(data))
+        try:
+            messages = data["Messages"]
+        except KeyError:
+            print("Not an expected event type. Skipping it", file=sys.stderr)
+            continue
+        else:
+            process_messages(messages)
+        finally:
+            if data and data.get("ReceiptHandle", None) is not None:
+                receipt_handle = data["ReceiptHandle"]
+                sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receipt_handle)
     print("All done. Exiting")
 
 
