@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import boto3
 
 
@@ -56,6 +57,9 @@ def main():
     sqs = boto3.client("sqs")
     queue_url = sqs.get_queue_url(QueueName=os.getenv("QUEUE_NAME"))["QueueUrl"]
     while True:
+        sleeptime = 1800
+        print("Sleeping", sleeptime, "seconds")
+        time.sleep(sleeptime)
         data = sqs.receive_message(QueueUrl=queue_url, WaitTimeSeconds=20)
         print(json.dumps(data))
         try:
