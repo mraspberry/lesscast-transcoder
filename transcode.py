@@ -56,7 +56,7 @@ def main():
     sqs = boto3.client("sqs")
     queue_url = sqs.get_queue_url(QueueName=os.getenv("QUEUE_NAME"))["QueueUrl"]
     while True:
-        data = sqs.receive_message(QueueUrl=queue_url, WaitTimeSeconds=600)
+        data = sqs.receive_message(QueueUrl=queue_url, WaitTimeSeconds=20)
         print(json.dumps(data))
         try:
             messages = data["Messages"]
