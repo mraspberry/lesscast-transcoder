@@ -6,4 +6,4 @@ COPY transcode.py requirements.txt ./
 RUN python3 -mpip install -r requirements.txt && \
     apt-get update && apt-get install -y ffmpeg lame
 
-CMD ["/app/transcode.py"]
+CMD ["python3", "-u", "/app/transcode.py"]
