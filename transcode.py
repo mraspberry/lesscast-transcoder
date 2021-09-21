@@ -57,11 +57,11 @@ def main():
     sqs = boto3.client("sqs")
     queue_url = sqs.get_queue_url(QueueName=os.getenv("QUEUE_NAME"))["QueueUrl"]
     while True:
-        sleeptime = 600
+        sleeptime = 60
         print("Sleeping", sleeptime, "seconds")
         time.sleep(sleeptime)
         data = sqs.receive_message(QueueUrl=queue_url, WaitTimeSeconds=20)
-        print(json.dumps(data))
+        print(json.dumps(data, indent=2))
         try:
             messages = data["Messages"]
         except KeyError:
